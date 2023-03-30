@@ -33,7 +33,7 @@ bool Parser::IsCommandReady()
 		return false;
 }
 
-void Parser::Search(char in)
+void Parser::Search(char& in)
 {
 
 	incoming_byte = in;

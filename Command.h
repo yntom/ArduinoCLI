@@ -37,14 +37,14 @@ public:
 				SerialUSB.print(*c);
 			}
 
-		SerialUSB.print('\n');
+			SerialUSB.print('\n');
 
 		}
 	}
 };
 
 
-class LedCommand : Command
+class LedCommand : public Command
 {
 private:
 	bool LedOn = false;

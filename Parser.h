@@ -31,7 +31,7 @@ public:
 
 	bool IsCommandReady();
 
-	void Search(char in);
+	void Search(char& in);
 
 	String GetCommand();
 };
