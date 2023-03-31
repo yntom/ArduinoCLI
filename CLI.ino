@@ -1,15 +1,14 @@
 #include "Parser.h"
 #include "Command.h"
 
-Parser par('$', ';');
-
 void setup()
 {
 	SerialUSB.begin(9600);
 }
 
-SayCommand com;
-LedCommand led(13);
+Parser par('$', ';');
+constexpr size_t COMMAND_NUMBER = 2u;
+Command* commands[COMMAND_NUMBER] = {new SayCommand(), new LedCommand()};
 
 void loop()
 {
@@ -21,8 +20,8 @@ void loop()
         if (par.IsCommandReady())
         {
             str = par.GetCommand();
-            com.Begin(str);
-            led.Begin(str);
-    	}
+            for (size_t i = 0u; i < COMMAND_NUMBER; ++i)
+                commands[i]->Begin(str);
+    	  }
     }
 }

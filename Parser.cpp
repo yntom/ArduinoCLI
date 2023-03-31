@@ -1,18 +1,10 @@
 #include "Parser.h"
 
-Parser::Parser()
+Parser::Parser(char start_symb = '$', char end_symb = ';')
 {
 	incoming_byte = ' ';
-	ResetBuffers();
-	start_symb = '$';
-	end_symb = ';';
-}
-
-Parser::Parser(char start_symb, char end_symb)
-{
 	this->start_symb = start_symb;
 	this->end_symb = end_symb;
-
 	ResetBuffers();
 }
 

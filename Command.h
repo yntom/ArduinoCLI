@@ -5,29 +5,36 @@
 
 class Command
 {
-protected:
-	String key_word;
-	String argument;
-	char devider;
-	bool start_command = false;
-
 public:
-	Command();
-	Command(String key_word, String argument, char devider);
+	virtual void Begin(String& command) = 0;
+	virtual ~Command() = default;
 };
 
-class SayCommand : public Command
+
+class CommandSettings : public Command
+{
+protected:
+	String key_word;
+  
+public:
+	void SetKeyWord(String key_word)
+	{
+		this->key_word = key_word;
+	}
+};
+
+
+class SayCommand : public CommandSettings
 {
 private:
 	//Maybe later
-
 public:
-	SayCommand()
+	SayCommand(String key_word = "say")
 	{
-		key_word = "say";
+		SetKeyWord(key_word);
 	}
 
-	void Begin(String& command)
+	void Begin(String& command) override
 	{
 		String str;
 		if (command.substring(0, 3) == key_word)
@@ -44,28 +51,20 @@ public:
 };
 
 
-class LedCommand : public Command
+class LedCommand : public CommandSettings
 {
 private:
 	bool LedOn = false;
 	uint8_t LED_PIN;
-
 public:
-	LedCommand()
+	LedCommand(String key_word = "led", uint8_t LED_PIN = 13)
 	{
-		uint8_t LED_PIN = 13;
-		key_word = "led";
+		this->LED_PIN = LED_PIN;
+		SetKeyWord(key_word);
 		pinMode(LED_PIN, OUTPUT);
 	}
 
-	LedCommand(uint8_t PIN)
-	{
-		LED_PIN = PIN;
-		key_word = "led";
-		pinMode(LED_PIN, OUTPUT);
-	}
-
-	void Begin(String& command)
+	void Begin(String& command) override
 	{
 		if (command.substring(0, 3) == key_word)
 		{
@@ -87,4 +86,5 @@ public:
 	}
 
 };
+
 #endif
