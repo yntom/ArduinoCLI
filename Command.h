@@ -2,89 +2,88 @@
 #define _COMMAND_h
 
 #include <Arduino.h>
+#include "Interface.h"
 
 class Command
 {
+protected:
+	String key_word;
 public:
-	virtual void Begin(String& command) = 0;
+	virtual void Begin(Parser* par, Interface** inter, uint8_t inter_num) = 0;
 	virtual ~Command() = default;
 };
 
-
-class CommandSettings : public Command
-{
-protected:
-	String key_word;
-  
-public:
-	void SetKeyWord(String key_word)
-	{
-		this->key_word = key_word;
-	}
-};
-
-
-class SayCommand : public CommandSettings
+class SayCommand : public Command
 {
 private:
 	//Maybe later
 public:
 	SayCommand(String key_word = "say")
 	{
-		SetKeyWord(key_word);
+		this->key_word = key_word;
 	}
 
-	void Begin(String& command) override
+	void Begin(Parser* par, Interface** inter, uint8_t inter_num) override
 	{
-		String str;
-		if (command.substring(0, 3) == key_word)
+		if (par->GetCommand(0) == key_word)
 		{
-			for (auto c = command.begin() + 4; (c != command.end()) && (*c != ';'); ++c)
+			for (uint8_t i = 1; i <= par->GetCommandCounter(); ++i)
 			{
-				SerialUSB.print(*c);
+				inter[inter_num]->Write(par->GetCommand(i));
+				inter[inter_num]->Write(" ");
 			}
-
-			SerialUSB.print('\n');
-
+			inter[inter_num]->Write("\n");
 		}
 	}
 };
 
-
-class LedCommand : public CommandSettings
+class SetCommand : public Command
 {
 private:
-	bool LedOn = false;
-	uint8_t LED_PIN;
+	uint8_t PIN;
 public:
-	LedCommand(String key_word = "led", uint8_t LED_PIN = 13)
+	SetCommand(String key_world = "set")
 	{
-		this->LED_PIN = LED_PIN;
-		SetKeyWord(key_word);
-		pinMode(LED_PIN, OUTPUT);
+		this->key_word = key_word;
 	}
 
-	void Begin(String& command) override
+	void Begin(Parser* par, Interface** inter, uint8_t inter_num) override
 	{
-		if (command.substring(0, 3) == key_word)
+		
+		if (par->GetCommand(0) == "set" &&
+			(par->GetCommand(1)).toInt() >= 0 &&
+			(par->GetCommand(1)).toInt() <= 53)
 		{
-			if (command.substring(4, 6) == "on")
+			if (par->GetCommand(2) == "on")
 			{
-				digitalWrite(LED_PIN, HIGH);
-				SerialUSB.println("LED has been turned on");
+				digitalWrite((par->GetCommand(1)).toInt(), HIGH);
 			}
-			else if (command.substring(4, 7) == "off")
+			if (par->GetCommand(2) == "off")
 			{
-				digitalWrite(LED_PIN, LOW);
-				SerialUSB.println("LED has been turned off");
-			}
-			else
-			{
-				SerialUSB.println("-> Syntax error");
+				digitalWrite((par->GetCommand(1)).toInt(), LOW);
 			}
 		}
 	}
-
 };
 
+class GetCommand : public Command
+{
+private:
+	uint8_t* counter;
+public:
+	GetCommand(uint8_t* counter, String key_world = "get")
+	{
+		this->counter = counter;
+		this->key_word = key_word;
+	}
+
+	void Begin(Parser* par, Interface** inter, uint8_t inter_num) override
+	{
+
+		if (par->GetCommand(0) == "get" && par->GetCommand(1) == "counter")	
+		{
+			inter[inter_num]->Writeln(String(*counter));
+		}
+	}
+};
 #endif
