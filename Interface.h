@@ -32,7 +32,7 @@ public:
 
 	bool is_active() override
 	{
-		if (digitalRead(PIN))
+		if (!digitalRead(PIN))
 		{
 			return true;
 		}
@@ -84,7 +84,7 @@ public:
 
 	bool is_active() override
 	{
-		if (digitalRead(PIN))
+		if (!digitalRead(PIN))
 		{
 			return true;
 		}
